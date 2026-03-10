@@ -12,11 +12,18 @@
 
 ## 📥 Download
 
+### Option 1: Chrome Web Store (Recommended)
+
+Install directly from the Chrome Web Store:
+
+[![Chrome Web Store](https://img.shields.io/badge/Chrome%20Web%20Store-Install-blue?logo=google-chrome)](https://chromewebstore.google.com/detail/Doppel/cjamdcimplldnofklcahcnahojjnpelg)
+
+### Option 2: Manual Installation
+
 Download the latest version from [Releases](https://github.com/momo2029/doppel/releases):
 - **Latest**: [doppel-latest.zip](https://github.com/momo2029/doppel/releases/download/latest/doppel-latest.zip)
 
-### Installation
-
+**Installation Steps:**
 1. Download `doppel-latest.zip`
 2. Unzip the file
 3. Open Chrome → Extensions → Enable "Developer mode"
