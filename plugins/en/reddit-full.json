@@ -1,0 +1,33 @@
+{
+  "id": "reddit-full",
+  "name_cn": "Reddit全能版",
+  "name_en": "Reddit Full Suite",
+  "description_cn": "Reddit自动化 + 导入 + AI 助手三合一",
+  "description_en": "Reddit automation + import + AI assistant all-in-one",
+  "type": "community",
+  "version": "1.0.0",
+  "author": "蟹蟹官方",
+  "lang": "en",
+  "rule": {
+    "capabilities": {
+      "automate": true,
+      "import": true,
+      "compose": true
+    },
+    "match": {
+      "urlPatterns": [
+        "*://*.reddit.com/*"
+      ]
+    },
+    "pageTypes": [],
+    "extractors": {},
+    "actions": {},
+    "onboarding": {
+      "startUrl": "https://reddit.com",
+      "loginCheck": {}
+    },
+    "options": {
+      "supportedActions": []
+    }
+  }
+}

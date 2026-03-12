@@ -1,0 +1,124 @@
+{
+  "id": "weibo-compose",
+  "name_cn": "微博 AI 助手",
+  "name_en": "微博 AI Assistant",
+  "description_cn": "在微博输入框旁显示 AI 按钮，辅助创作",
+  "description_en": "AI button beside 微博 input box for writing assistance",
+  "type": "community",
+  "version": "1.0.0",
+  "author": "蟹蟹官方",
+  "lang": "zh-CN",
+  "rule": {
+    "capabilities": {
+      "compose": true
+    },
+    "match": {
+      "urlPatterns": [
+        "*://weibo.com/*",
+        "*://www.weibo.com/*"
+      ]
+    },
+    "pageTypes": [
+      {
+        "name": "home",
+        "priority": 10,
+        "conditions": {
+          "urlMatch": "^https?://(www\\.)?weibo\\.com/?$"
+        }
+      },
+      {
+        "name": "hot",
+        "priority": 15,
+        "conditions": {
+          "urlContains": [
+            "/hot/"
+          ]
+        }
+      },
+      {
+        "name": "detail",
+        "priority": 30,
+        "conditions": {
+          "or": [
+            {
+              "urlContains": [
+                "/detail/"
+              ]
+            },
+            {
+              "urlMatch": "/\\d+/[A-Za-z0-9]+$"
+            }
+          ]
+        }
+      },
+      {
+        "name": "profile",
+        "priority": 20,
+        "conditions": {
+          "urlContains": [
+            "/u/"
+          ]
+        }
+      },
+      {
+        "name": "atme",
+        "priority": 26,
+        "conditions": {
+          "urlContains": [
+            "/at/"
+          ]
+        }
+      }
+    ],
+    "extractors": {
+      "currentUser": {
+        "selector": ".woo-avatar-img",
+        "attribute": "alt"
+      }
+    },
+    "actions": {
+      "reply": {
+        "input": {
+          "selector": ".wbpro-form textarea",
+          "type": "textarea"
+        },
+        "submit": {
+          "selector": "button.woo-button-main.woo-button-primary",
+          "waitAfterClick": 2000
+        }
+      }
+    },
+    "onboarding": {
+      "startUrl": "https://weibo.com",
+      "loginCheck": {
+        "selector": ".woo-avatar-img[alt]",
+        "urlNotContains": "/login"
+      },
+      "loginUrl": "https://weibo.com/login.php",
+      "loginHint": "请先登录微博账号"
+    },
+    "uiInjection": {
+      "aiButton": {
+        "pageTypes": [
+          "home",
+          "detail",
+          "hot",
+          "profile"
+        ],
+        "injections": [
+          {
+            "targetSelector": "button.woo-button-primary.woo-button-m.disabled",
+            "position": "before",
+            "inputSelector": "textarea",
+            "inputType": "textarea"
+          }
+        ]
+      }
+    },
+    "options": {
+      "supportedActions": [
+        "reply"
+      ]
+    }
+  }
+}

@@ -1,0 +1,240 @@
+{
+  "id": "weibo-automate",
+  "name_cn": "微博自动化",
+  "name_en": "微博 Auto",
+  "description_cn": "自动巡逻微博，AI 智能回复和点赞",
+  "description_en": "Auto-patrol 微博, AI-powered replies and likes",
+  "type": "community",
+  "version": "1.0.0",
+  "author": "蟹蟹官方",
+  "lang": "zh-CN",
+  "rule": {
+    "capabilities": {
+      "automate": true
+    },
+    "match": {
+      "urlPatterns": [
+        "*://weibo.com/*",
+        "*://www.weibo.com/*"
+      ]
+    },
+    "pageTypes": [
+      {
+        "name": "home",
+        "priority": 10,
+        "conditions": {
+          "urlMatch": "^https?://(www\\.)?weibo\\.com/?$"
+        }
+      },
+      {
+        "name": "hot",
+        "priority": 15,
+        "conditions": {
+          "urlContains": [
+            "/hot/"
+          ]
+        }
+      },
+      {
+        "name": "detail",
+        "priority": 30,
+        "conditions": {
+          "or": [
+            {
+              "urlContains": [
+                "/detail/"
+              ]
+            },
+            {
+              "urlMatch": "/\\d+/[A-Za-z0-9]+$"
+            }
+          ]
+        }
+      },
+      {
+        "name": "profile",
+        "priority": 20,
+        "conditions": {
+          "urlContains": [
+            "/u/"
+          ]
+        }
+      },
+      {
+        "name": "atme",
+        "priority": 26,
+        "conditions": {
+          "urlContains": [
+            "/at/"
+          ]
+        }
+      }
+    ],
+    "extractors": {
+      "lists": {
+        "home": {
+          "container": ".vue-recycle-scroller__item-wrapper",
+          "item": "[class*='_feed_']",
+          "fields": {
+            "title": {
+              "selector": "[class*='_wbtext_']",
+              "transform": "trim"
+            },
+            "url": {
+              "selector": "a[href*='/detail/']",
+              "attribute": "href"
+            },
+            "author": {
+              "selector": "[class*='_name_']",
+              "transform": "trim"
+            }
+          }
+        },
+        "hot": {
+          "container": ".vue-recycle-scroller__item-wrapper",
+          "item": "[class*='_feed_']",
+          "fields": {
+            "title": {
+              "selector": "[class*='_wbtext_']",
+              "transform": "trim"
+            },
+            "url": {
+              "selector": "a[href*='/detail/']",
+              "attribute": "href"
+            },
+            "author": {
+              "selector": "[class*='_name_']",
+              "transform": "trim"
+            }
+          }
+        },
+        "profile": {
+          "container": ".vue-recycle-scroller__item-wrapper",
+          "item": "[class*='_feed_']",
+          "fields": {
+            "title": {
+              "selector": "[class*='_wbtext_']",
+              "transform": "trim"
+            },
+            "url": {
+              "selector": "a[href*='/detail/']",
+              "attribute": "href"
+            },
+            "author": {
+              "selector": "[class*='_name_']",
+              "transform": "trim"
+            }
+          }
+        }
+      },
+      "detail": {
+        "title": {
+          "selector": "[class*='_wbtext_']",
+          "transform": "trim"
+        },
+        "author": {
+          "selector": "[class*='_name_']",
+          "transform": "trim"
+        },
+        "content": {
+          "selector": "[class*='_wbtext_']"
+        },
+        "time": {
+          "selector": "[class*='_time_']",
+          "transform": "trim"
+        },
+        "replies": {
+          "container": ".wbpro-list",
+          "item": ".item1",
+          "fields": {
+            "author": {
+              "selector": ".con1 a",
+              "transform": "trim"
+            },
+            "content": {
+              "selector": ".con1 .text span"
+            }
+          }
+        }
+      },
+      "currentUser": {
+        "selector": ".woo-avatar-img",
+        "attribute": "alt"
+      }
+    },
+    "actions": {
+      "clickPost": {
+        "selector": "a[href*='/detail/']"
+      },
+      "reply": {
+        "input": {
+          "selector": ".wbpro-form textarea",
+          "type": "textarea"
+        },
+        "submit": {
+          "selector": "button.woo-button-main.woo-button-primary",
+          "waitAfterClick": 2000
+        }
+      },
+      "like": {
+        "selector": ".woo-like-main",
+        "waitAfterClick": 500
+      }
+    },
+    "contentProcessing": {
+      "cleanup": {
+        "removeSelectors": [
+          ".expand",
+          "[class*='_toolbar_']"
+        ],
+        "maxLength": 2000
+      }
+    },
+    "onboarding": {
+      "startUrl": "https://weibo.com",
+      "loginCheck": {
+        "selector": ".woo-avatar-img[alt]",
+        "urlNotContains": "/login"
+      },
+      "loginUrl": "https://weibo.com/login.php",
+      "loginHint": "请先登录微博账号"
+    },
+    "options": {
+      "supportedActions": [
+        "reply",
+        "like"
+      ],
+      "delays": {
+        "afterPageLoad": [
+          2000,
+          4000
+        ],
+        "afterClick": [
+          1000,
+          2000
+        ],
+        "afterReply": [
+          3000,
+          5000
+        ]
+      },
+      "patrolModes": [
+        {
+          "value": "home",
+          "label": "首页",
+          "startUrl": "https://weibo.com"
+        },
+        {
+          "value": "hot",
+          "label": "热门",
+          "startUrl": "https://weibo.com/hot/weibo"
+        },
+        {
+          "value": "atme",
+          "label": "@我",
+          "startUrl": "https://weibo.com/at/weibo"
+        }
+      ]
+    }
+  }
+}

@@ -1,0 +1,32 @@
+{
+  "id": "twitter-compose",
+  "name_cn": "Twitter AI 助手",
+  "name_en": "Twitter AI Assistant",
+  "description_cn": "在Twitter输入框旁显示 AI 按钮，辅助创作",
+  "description_en": "AI button beside Twitter input box for writing assistance",
+  "type": "community",
+  "version": "1.0.0",
+  "author": "蟹蟹官方",
+  "lang": "en",
+  "rule": {
+    "capabilities": {
+      "compose": true
+    },
+    "match": {
+      "urlPatterns": [
+        "*://twitter.com/*",
+        "*://x.com/*"
+      ]
+    },
+    "pageTypes": [],
+    "extractors": {},
+    "actions": {},
+    "onboarding": {
+      "startUrl": "https://twitter.com",
+      "loginCheck": {}
+    },
+    "options": {
+      "supportedActions": []
+    }
+  }
+}

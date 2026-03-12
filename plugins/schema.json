@@ -1,0 +1,516 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Doppel Plugin",
+  "description": "Schema for Doppel (蟹蟹) browser extension plugins",
+  "type": "object",
+  "required": ["id", "name_en", "version", "author", "lang", "type", "rule"],
+  "properties": {
+    "id": {
+      "type": "string",
+      "pattern": "^[a-z0-9-]+$",
+      "description": "Unique plugin identifier, e.g. 'weibo-automate'"
+    },
+    "name_cn": {
+      "type": "string",
+      "description": "Chinese display name"
+    },
+    "name_en": {
+      "type": "string",
+      "description": "English display name"
+    },
+    "description_cn": {
+      "type": "string",
+      "description": "Chinese description"
+    },
+    "description_en": {
+      "type": "string",
+      "description": "English description"
+    },
+    "type": {
+      "type": "string",
+      "enum": ["community", "official"],
+      "description": "Plugin type. Community plugins are user-contributed"
+    },
+    "version": {
+      "type": "string",
+      "pattern": "^\\d+\\.\\d+\\.\\d+$",
+      "description": "Semantic version, e.g. '1.0.0'"
+    },
+    "author": {
+      "type": "string",
+      "description": "Plugin author name"
+    },
+    "lang": {
+      "type": "string",
+      "enum": ["zh-CN", "en"],
+      "description": "Target site language"
+    },
+    "rule": {
+      "type": "object",
+      "required": ["match"],
+      "properties": {
+        "capabilities": {
+          "$ref": "#/definitions/Capabilities"
+        },
+        "match": {
+          "$ref": "#/definitions/Match"
+        },
+        "pageTypes": {
+          "type": "array",
+          "items": { "$ref": "#/definitions/PageTypeRule" }
+        },
+        "extractors": {
+          "$ref": "#/definitions/ContentExtractors"
+        },
+        "actions": {
+          "$ref": "#/definitions/ActionRules"
+        },
+        "contentProcessing": {
+          "$ref": "#/definitions/ContentProcessing"
+        },
+        "uiInjection": {
+          "$ref": "#/definitions/UIInjection"
+        },
+        "enhancements": {
+          "$ref": "#/definitions/EnhancementsConfig"
+        },
+        "onboarding": {
+          "$ref": "#/definitions/OnboardingConfig"
+        },
+        "options": {
+          "$ref": "#/definitions/RuleOptions"
+        }
+      },
+      "additionalProperties": false
+    }
+  },
+  "additionalProperties": false,
+  "definitions": {
+    "Capabilities": {
+      "type": "object",
+      "properties": {
+        "automate": { "type": "boolean", "description": "Auto-patrol and interact" },
+        "import": { "type": "boolean", "description": "Import/export user content" },
+        "compose": { "type": "boolean", "description": "AI writing assistant" },
+        "enhance": { "type": "boolean", "description": "Content enhancement" },
+        "translate": { "type": "boolean", "description": "Translation" },
+        "browse": { "type": "boolean", "description": "Browse enhancement" }
+      },
+      "additionalProperties": false
+    },
+    "Match": {
+      "type": "object",
+      "required": ["urlPatterns"],
+      "properties": {
+        "urlPatterns": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "Chrome match patterns, e.g. '*://weibo.com/*'"
+        },
+        "excludePatterns": {
+          "type": "array",
+          "items": { "type": "string" }
+        }
+      },
+      "additionalProperties": false
+    },
+    "FieldExtractor": {
+      "type": "object",
+      "required": ["selector"],
+      "properties": {
+        "selector": { "type": "string", "description": "CSS selector" },
+        "attribute": { "type": "string", "description": "HTML attribute to extract, defaults to textContent" },
+        "regex": { "type": "string" },
+        "regexGroup": { "type": "integer" },
+        "transform": {
+          "type": "string",
+          "enum": ["trim", "parseInt", "parseFloat", "toLowerCase", "toUpperCase", "boolean"]
+        },
+        "default": { "type": "string" },
+        "styleCheck": {
+          "type": "object",
+          "properties": {
+            "property": { "type": "string" },
+            "operator": { "type": "string", "enum": ["equals", "gte", "lte", "contains"] },
+            "value": {}
+          }
+        },
+        "classCheck": {
+          "type": "object",
+          "properties": {
+            "has": { "type": "string" },
+            "notHas": { "type": "string" }
+          }
+        }
+      }
+    },
+    "PageConditions": {
+      "type": "object",
+      "properties": {
+        "urlMatch": { "type": "string", "description": "URL regex pattern" },
+        "urlContains": { "type": "array", "items": { "type": "string" } },
+        "urlNotContains": { "type": "array", "items": { "type": "string" } },
+        "hashContains": { "type": "string" },
+        "selector": { "type": "string" },
+        "domExists": { "type": "string" },
+        "domNotExists": { "type": "string" },
+        "or": { "type": "array", "items": { "$ref": "#/definitions/PageConditions" } },
+        "and": { "type": "array", "items": { "$ref": "#/definitions/PageConditions" } }
+      }
+    },
+    "PageTypeRule": {
+      "type": "object",
+      "required": ["name", "priority", "conditions"],
+      "properties": {
+        "name": { "type": "string", "description": "Page type name: list, detail, home, profile, etc." },
+        "priority": { "type": "integer", "description": "Higher number = higher priority" },
+        "conditions": { "$ref": "#/definitions/PageConditions" }
+      }
+    },
+    "ListExtractor": {
+      "type": "object",
+      "required": ["container", "item", "fields"],
+      "properties": {
+        "container": { "type": "string" },
+        "item": { "type": "string" },
+        "fields": {
+          "type": "object",
+          "required": ["title", "url"],
+          "properties": {
+            "title": { "$ref": "#/definitions/FieldExtractor" },
+            "url": { "$ref": "#/definitions/FieldExtractor" },
+            "author": { "$ref": "#/definitions/FieldExtractor" },
+            "time": { "$ref": "#/definitions/FieldExtractor" },
+            "replyCount": { "$ref": "#/definitions/FieldExtractor" },
+            "isTop": { "$ref": "#/definitions/FieldExtractor" },
+            "isRead": { "$ref": "#/definitions/FieldExtractor" }
+          }
+        },
+        "filters": {
+          "type": "object",
+          "properties": {
+            "excludeTop": { "type": "boolean" },
+            "excludeRead": { "type": "boolean" },
+            "maxItems": { "type": "integer" }
+          }
+        }
+      }
+    },
+    "DetailExtractor": {
+      "type": "object",
+      "required": ["title", "author", "content"],
+      "properties": {
+        "title": { "$ref": "#/definitions/FieldExtractor" },
+        "author": { "$ref": "#/definitions/FieldExtractor" },
+        "content": { "$ref": "#/definitions/FieldExtractor" },
+        "time": { "$ref": "#/definitions/FieldExtractor" },
+        "replies": {
+          "type": "object",
+          "required": ["container", "item", "fields"],
+          "properties": {
+            "container": { "type": "string" },
+            "item": { "type": "string" },
+            "fields": {
+              "type": "object",
+              "required": ["author", "content"],
+              "properties": {
+                "author": { "$ref": "#/definitions/FieldExtractor" },
+                "content": { "$ref": "#/definitions/FieldExtractor" },
+                "time": { "$ref": "#/definitions/FieldExtractor" },
+                "floor": { "$ref": "#/definitions/FieldExtractor" }
+              }
+            }
+          }
+        }
+      }
+    },
+    "ContentExtractors": {
+      "type": "object",
+      "properties": {
+        "lists": {
+          "type": "object",
+          "additionalProperties": { "$ref": "#/definitions/ListExtractor" }
+        },
+        "list": { "$ref": "#/definitions/ListExtractor" },
+        "detail": { "$ref": "#/definitions/DetailExtractor" },
+        "currentUser": { "$ref": "#/definitions/FieldExtractor" }
+      }
+    },
+    "ReplyAction": {
+      "type": "object",
+      "required": ["input", "submit"],
+      "properties": {
+        "input": {
+          "type": "object",
+          "required": ["selector", "type"],
+          "properties": {
+            "selector": { "type": "string" },
+            "type": { "type": "string", "enum": ["textarea", "contenteditable", "input"] }
+          }
+        },
+        "submit": {
+          "type": "object",
+          "required": ["selector"],
+          "properties": {
+            "selector": { "type": "string" },
+            "waitAfterClick": { "type": "integer" }
+          }
+        },
+        "prepare": {
+          "type": "object",
+          "required": ["selector"],
+          "properties": {
+            "selector": { "type": "string" },
+            "waitAfterClick": { "type": "integer" }
+          }
+        }
+      }
+    },
+    "ToggleAction": {
+      "type": "object",
+      "required": ["selector"],
+      "properties": {
+        "selector": { "type": "string" },
+        "activeClass": { "type": "string" },
+        "activeSelector": { "type": "string" },
+        "waitAfterClick": { "type": "integer" }
+      }
+    },
+    "ActionRules": {
+      "type": "object",
+      "properties": {
+        "clickPost": { "type": "object", "properties": { "selector": { "type": "string" } } },
+        "clickRefer": { "type": "object", "properties": { "selector": { "type": "string" } } },
+        "clickExpand": { "type": "object", "properties": { "selector": { "type": "string" } } },
+        "clickReplyLink": { "type": "object", "properties": { "selector": { "type": "string" } } },
+        "closeDetail": {
+          "type": "object",
+          "properties": {
+            "selector": { "type": "string" },
+            "fallback": { "type": "object", "properties": { "selector": { "type": "string" }, "action": { "type": "string" } } }
+          }
+        },
+        "reply": { "$ref": "#/definitions/ReplyAction" },
+        "like": { "$ref": "#/definitions/ToggleAction" },
+        "collect": { "$ref": "#/definitions/ToggleAction" },
+        "follow": { "$ref": "#/definitions/ToggleAction" },
+        "repost": {
+          "type": "object",
+          "properties": {
+            "selector": { "type": "string" },
+            "confirmSelector": { "type": "string" },
+            "waitAfterClick": { "type": "integer" }
+          }
+        }
+      }
+    },
+    "ContentProcessing": {
+      "type": "object",
+      "properties": {
+        "cleanup": {
+          "type": "object",
+          "properties": {
+            "removeSelectors": { "type": "array", "items": { "type": "string" } },
+            "removePatterns": { "type": "array", "items": { "type": "string" } },
+            "maxLength": { "type": "integer" }
+          }
+        },
+        "reply": {
+          "type": "object",
+          "properties": {
+            "preserveQuote": {
+              "type": "object",
+              "properties": {
+                "pattern": { "type": "string" },
+                "position": { "type": "string", "enum": ["before", "after"] }
+              }
+            }
+          }
+        }
+      }
+    },
+    "ButtonInjection": {
+      "type": "object",
+      "required": ["targetSelector", "position"],
+      "properties": {
+        "targetSelector": { "type": "string" },
+        "position": { "type": "string", "enum": ["before", "after", "prepend", "append"] }
+      }
+    },
+    "UIInjection": {
+      "type": "object",
+      "properties": {
+        "aiButton": {
+          "type": "object",
+          "required": ["pageTypes", "injections"],
+          "properties": {
+            "pageTypes": { "type": "array", "items": { "type": "string" } },
+            "injections": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "required": ["targetSelector", "position", "inputSelector", "inputType"],
+                "properties": {
+                  "targetSelector": { "type": "string" },
+                  "position": { "type": "string", "enum": ["before", "after", "prepend", "append"] },
+                  "inputSelector": { "type": "string" },
+                  "inputType": { "type": "string", "enum": ["textarea", "contenteditable", "input"] }
+                }
+              }
+            }
+          }
+        },
+        "exportButton": {
+          "type": "object",
+          "required": ["pageTypes", "injection", "dataSource", "exportTo"],
+          "properties": {
+            "pageTypes": { "type": "array", "items": { "type": "string" } },
+            "showCondition": {
+              "type": "object",
+              "properties": {
+                "selector": { "type": "string" },
+                "exists": { "type": "boolean" }
+              }
+            },
+            "injection": { "$ref": "#/definitions/ButtonInjection" },
+            "buttonText": { "type": "string" },
+            "buttonIcon": { "type": "string" },
+            "dataSource": {
+              "type": "object",
+              "required": ["fields"],
+              "properties": {
+                "type": { "type": "string", "enum": ["dom", "api"] },
+                "listSelector": { "type": "string" },
+                "itemSelector": { "type": "string" },
+                "apiUrl": { "type": "string" },
+                "apiUrls": { "type": "array", "items": { "type": "string" } },
+                "uidFromUrl": { "type": "string" },
+                "responseMapping": {
+                  "type": "object",
+                  "properties": {
+                    "list": { "type": "string" },
+                    "hasMore": { "type": "string" }
+                  }
+                },
+                "fields": {
+                  "type": "object",
+                  "required": ["content"],
+                  "properties": {
+                    "id": {},
+                    "title": {},
+                    "content": {},
+                    "author": {},
+                    "time": {},
+                    "url": {}
+                  }
+                },
+                "pagination": {
+                  "type": "object",
+                  "properties": {
+                    "type": { "type": "string", "enum": ["scroll", "click", "none", "page"] },
+                    "nextSelector": { "type": "string" },
+                    "loadMoreSelector": { "type": "string" },
+                    "hasMoreCheck": { "type": "string" },
+                    "scrollDelay": { "type": "integer" },
+                    "maxPages": { "type": "integer" }
+                  }
+                }
+              }
+            },
+            "exportTo": {
+              "type": "object",
+              "required": ["api", "platform"],
+              "properties": {
+                "api": { "type": "string" },
+                "platform": { "type": "string" }
+              }
+            }
+          }
+        }
+      }
+    },
+    "EnhancementsConfig": {
+      "type": "object",
+      "required": ["pageTypes"],
+      "properties": {
+        "pageTypes": { "type": "array", "items": { "type": "string" } },
+        "interestScore": { "type": "object" },
+        "translate": { "type": "object" },
+        "summary": { "type": "object" },
+        "cache": {
+          "type": "object",
+          "properties": {
+            "enabled": { "type": "boolean" },
+            "ttl": { "type": "integer" },
+            "maxItems": { "type": "integer" }
+          }
+        },
+        "requestControl": {
+          "type": "object",
+          "properties": {
+            "maxConcurrent": { "type": "integer" },
+            "delayBetween": { "type": "integer" },
+            "retryCount": { "type": "integer" }
+          }
+        }
+      }
+    },
+    "OnboardingConfig": {
+      "type": "object",
+      "required": ["startUrl", "loginCheck"],
+      "properties": {
+        "startUrl": { "type": "string", "format": "uri" },
+        "loginCheck": {
+          "type": "object",
+          "properties": {
+            "selector": { "type": "string" },
+            "notExistsSelector": { "type": "string" },
+            "cookie": { "type": "string" },
+            "urlNotContains": { "type": "string" }
+          }
+        },
+        "loginUrl": { "type": "string" },
+        "loginHint": { "type": "string" }
+      }
+    },
+    "RuleOptions": {
+      "type": "object",
+      "required": ["supportedActions"],
+      "properties": {
+        "supportedActions": {
+          "type": "array",
+          "items": { "type": "string", "enum": ["reply", "like", "collect", "follow", "repost"] }
+        },
+        "delays": {
+          "type": "object",
+          "properties": {
+            "afterPageLoad": { "type": "array", "items": { "type": "integer" }, "minItems": 2, "maxItems": 2 },
+            "afterClick": { "type": "array", "items": { "type": "integer" }, "minItems": 2, "maxItems": 2 },
+            "afterReply": { "type": "array", "items": { "type": "integer" }, "minItems": 2, "maxItems": 2 }
+          }
+        },
+        "patrolModes": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["value", "label"],
+            "properties": {
+              "value": { "type": "string" },
+              "label": { "type": "string" },
+              "description": { "type": "string" },
+              "startUrl": { "type": "string" }
+            }
+          }
+        },
+        "patrolBehavior": {
+          "type": "object",
+          "properties": {
+            "skipRate": { "type": "number" },
+            "interactionRate": { "type": "number" },
+            "actionWeights": { "type": "object" }
+          }
+        }
+      }
+    }
+  }
+}

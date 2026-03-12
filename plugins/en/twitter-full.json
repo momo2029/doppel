@@ -1,0 +1,34 @@
+{
+  "id": "twitter-full",
+  "name_cn": "Twitter全能版",
+  "name_en": "Twitter Full Suite",
+  "description_cn": "Twitter自动化 + 导入 + AI 助手三合一",
+  "description_en": "Twitter automation + import + AI assistant all-in-one",
+  "type": "community",
+  "version": "1.0.0",
+  "author": "蟹蟹官方",
+  "lang": "en",
+  "rule": {
+    "capabilities": {
+      "automate": true,
+      "import": true,
+      "compose": true
+    },
+    "match": {
+      "urlPatterns": [
+        "*://twitter.com/*",
+        "*://x.com/*"
+      ]
+    },
+    "pageTypes": [],
+    "extractors": {},
+    "actions": {},
+    "onboarding": {
+      "startUrl": "https://twitter.com",
+      "loginCheck": {}
+    },
+    "options": {
+      "supportedActions": []
+    }
+  }
+}

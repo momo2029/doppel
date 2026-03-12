@@ -1,0 +1,87 @@
+{
+  "id": "weibo-import",
+  "name_cn": "微博导入",
+  "name_en": "微博 Import",
+  "description_cn": "导出微博内容到记忆库",
+  "description_en": "Export 微博 content to memory",
+  "type": "community",
+  "version": "1.0.0",
+  "author": "蟹蟹官方",
+  "lang": "zh-CN",
+  "rule": {
+    "capabilities": {
+      "import": true
+    },
+    "match": {
+      "urlPatterns": [
+        "*://weibo.com/*",
+        "*://www.weibo.com/*"
+      ]
+    },
+    "pageTypes": [
+      {
+        "name": "profile",
+        "priority": 20,
+        "conditions": {
+          "urlContains": [
+            "/u/"
+          ]
+        }
+      }
+    ],
+    "extractors": {},
+    "actions": {},
+    "onboarding": {
+      "startUrl": "https://weibo.com",
+      "loginCheck": {
+        "selector": ".woo-avatar-img[alt]",
+        "urlNotContains": "/login"
+      },
+      "loginUrl": "https://weibo.com/login.php",
+      "loginHint": "请先登录微博账号"
+    },
+    "uiInjection": {
+      "exportButton": {
+        "pageTypes": [
+          "profile"
+        ],
+        "showCondition": {
+          "selector": "input[placeholder*='搜索我的微博']",
+          "exists": true
+        },
+        "injection": {
+          "targetSelector": "[class*='_name_']",
+          "position": "after"
+        },
+        "buttonText": "导出微博",
+        "buttonIcon": "📤",
+        "dataSource": {
+          "type": "api",
+          "apiUrl": "/ajax/statuses/mymblog?uid={uid}&page={page}&feature=0",
+          "uidFromUrl": "/u/(\\d+)",
+          "responseMapping": {
+            "list": "data.list",
+            "hasMore": "data.list.length > 0"
+          },
+          "fields": {
+            "id": "idstr",
+            "content": "text_raw",
+            "time": "created_at",
+            "url": "mblogid"
+          },
+          "pagination": {
+            "type": "page",
+            "maxPages": 1000
+          }
+        },
+        "exportTo": {
+          "api": "/api/dna/memory/import",
+          "platform": "weibo"
+        }
+      }
+    },
+    "options": {
+      "supportedActions": []
+    }
+  }
+}

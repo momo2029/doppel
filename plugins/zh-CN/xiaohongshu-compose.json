@@ -1,0 +1,114 @@
+{
+  "id": "xiaohongshu-compose",
+  "name_cn": "小红书 AI 助手",
+  "name_en": "小红书 AI Assistant",
+  "description_cn": "在小红书输入框旁显示 AI 按钮，辅助创作",
+  "description_en": "AI button beside 小红书 input box for writing assistance",
+  "type": "community",
+  "version": "1.0.0",
+  "author": "蟹蟹官方",
+  "lang": "zh-CN",
+  "rule": {
+    "capabilities": {
+      "compose": true
+    },
+    "match": {
+      "urlPatterns": [
+        "*://www.xiaohongshu.com/*",
+        "*://xiaohongshu.com/*"
+      ]
+    },
+    "pageTypes": [
+      {
+        "name": "home",
+        "priority": 10,
+        "conditions": {
+          "urlMatch": "^https?://(www\\.)?xiaohongshu\\.com/(explore)?$"
+        }
+      },
+      {
+        "name": "detail",
+        "priority": 30,
+        "conditions": {
+          "or": [
+            {
+              "urlMatch": "/explore/[a-z0-9]+(\\?|$)"
+            },
+            {
+              "hashContains": "#/note/"
+            },
+            {
+              "selector": ".note-detail-mask, .note-scroller"
+            }
+          ]
+        }
+      },
+      {
+        "name": "search",
+        "priority": 20,
+        "conditions": {
+          "urlContains": [
+            "/search_result"
+          ]
+        }
+      },
+      {
+        "name": "profile",
+        "priority": 25,
+        "conditions": {
+          "urlContains": [
+            "/user/profile/"
+          ]
+        }
+      }
+    ],
+    "extractors": {
+      "currentUser": {
+        "selector": ".user-info .name, .sidebar-user .name",
+        "transform": "trim"
+      }
+    },
+    "actions": {
+      "reply": {
+        "input": {
+          "selector": "#content-textarea",
+          "type": "contenteditable"
+        },
+        "submit": {
+          "selector": ".input-box .submit-btn, .comment-input .submit, button.submit",
+          "fallback": "enter",
+          "waitAfterClick": 2000
+        }
+      }
+    },
+    "onboarding": {
+      "startUrl": "https://www.xiaohongshu.com/explore",
+      "loginCheck": {
+        "selector": ".user-info .name, .sidebar-user .name",
+        "urlNotContains": "/login"
+      },
+      "loginUrl": "https://www.xiaohongshu.com/login",
+      "loginHint": "请先登录小红书账号"
+    },
+    "uiInjection": {
+      "aiButton": {
+        "pageTypes": [
+          "detail"
+        ],
+        "injections": [
+          {
+            "targetSelector": ".engage-bar .right-btn-area",
+            "position": "prepend",
+            "inputSelector": "#content-textarea",
+            "inputType": "contenteditable"
+          }
+        ]
+      }
+    },
+    "options": {
+      "supportedActions": [
+        "reply"
+      ]
+    }
+  }
+}

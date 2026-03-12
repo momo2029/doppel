@@ -1,0 +1,31 @@
+{
+  "id": "reddit-automate",
+  "name_cn": "Reddit自动化",
+  "name_en": "Reddit Auto",
+  "description_cn": "自动巡逻Reddit，AI 智能回复和点赞",
+  "description_en": "Auto-patrol Reddit, AI-powered replies and likes",
+  "type": "community",
+  "version": "1.0.0",
+  "author": "蟹蟹官方",
+  "lang": "en",
+  "rule": {
+    "capabilities": {
+      "automate": true
+    },
+    "match": {
+      "urlPatterns": [
+        "*://*.reddit.com/*"
+      ]
+    },
+    "pageTypes": [],
+    "extractors": {},
+    "actions": {},
+    "onboarding": {
+      "startUrl": "https://reddit.com",
+      "loginCheck": {}
+    },
+    "options": {
+      "supportedActions": []
+    }
+  }
+}

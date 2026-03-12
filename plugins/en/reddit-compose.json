@@ -1,0 +1,31 @@
+{
+  "id": "reddit-compose",
+  "name_cn": "Reddit AI 助手",
+  "name_en": "Reddit AI Assistant",
+  "description_cn": "在Reddit输入框旁显示 AI 按钮，辅助创作",
+  "description_en": "AI button beside Reddit input box for writing assistance",
+  "type": "community",
+  "version": "1.0.0",
+  "author": "蟹蟹官方",
+  "lang": "en",
+  "rule": {
+    "capabilities": {
+      "compose": true
+    },
+    "match": {
+      "urlPatterns": [
+        "*://*.reddit.com/*"
+      ]
+    },
+    "pageTypes": [],
+    "extractors": {},
+    "actions": {},
+    "onboarding": {
+      "startUrl": "https://reddit.com",
+      "loginCheck": {}
+    },
+    "options": {
+      "supportedActions": []
+    }
+  }
+}

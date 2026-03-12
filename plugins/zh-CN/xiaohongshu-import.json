@@ -1,0 +1,89 @@
+{
+  "id": "xiaohongshu-import",
+  "name_cn": "小红书导入",
+  "name_en": "小红书 Import",
+  "description_cn": "导出小红书内容到记忆库",
+  "description_en": "Export 小红书 content to memory",
+  "type": "community",
+  "version": "1.0.0",
+  "author": "蟹蟹官方",
+  "lang": "zh-CN",
+  "rule": {
+    "capabilities": {
+      "import": true
+    },
+    "match": {
+      "urlPatterns": [
+        "*://www.xiaohongshu.com/*",
+        "*://xiaohongshu.com/*"
+      ]
+    },
+    "pageTypes": [
+      {
+        "name": "profile",
+        "priority": 25,
+        "conditions": {
+          "urlContains": [
+            "/user/profile/"
+          ]
+        }
+      }
+    ],
+    "extractors": {},
+    "actions": {},
+    "onboarding": {
+      "startUrl": "https://www.xiaohongshu.com/explore",
+      "loginCheck": {
+        "selector": ".user-info .name, .sidebar-user .name",
+        "urlNotContains": "/login"
+      },
+      "loginUrl": "https://www.xiaohongshu.com/login",
+      "loginHint": "请先登录小红书账号"
+    },
+    "uiInjection": {
+      "exportButton": {
+        "pageTypes": [
+          "profile"
+        ],
+        "injection": {
+          "targetSelector": ".user-info, .user-detail",
+          "position": "after"
+        },
+        "buttonText": "导出笔记",
+        "buttonIcon": "📤",
+        "dataSource": {
+          "listSelector": ".feeds-page, .user-notes",
+          "itemSelector": "section.note-item",
+          "fields": {
+            "title": {
+              "selector": ".title"
+            },
+            "content": {
+              "selector": ".desc, .note-text"
+            },
+            "time": {
+              "selector": ".date, .time",
+              "transform": "trim"
+            },
+            "url": {
+              "selector": "a.cover",
+              "attribute": "href"
+            }
+          },
+          "pagination": {
+            "type": "scroll",
+            "scrollDelay": 2000,
+            "maxPages": 20
+          }
+        },
+        "exportTo": {
+          "api": "/api/memory/import",
+          "platform": "xiaohongshu"
+        }
+      }
+    },
+    "options": {
+      "supportedActions": []
+    }
+  }
+}

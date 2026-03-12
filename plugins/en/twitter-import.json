@@ -1,0 +1,32 @@
+{
+  "id": "twitter-import",
+  "name_cn": "Twitter导入",
+  "name_en": "Twitter Import",
+  "description_cn": "导出Twitter内容到记忆库",
+  "description_en": "Export Twitter content to memory",
+  "type": "community",
+  "version": "1.0.0",
+  "author": "蟹蟹官方",
+  "lang": "en",
+  "rule": {
+    "capabilities": {
+      "import": true
+    },
+    "match": {
+      "urlPatterns": [
+        "*://twitter.com/*",
+        "*://x.com/*"
+      ]
+    },
+    "pageTypes": [],
+    "extractors": {},
+    "actions": {},
+    "onboarding": {
+      "startUrl": "https://twitter.com",
+      "loginCheck": {}
+    },
+    "options": {
+      "supportedActions": []
+    }
+  }
+}

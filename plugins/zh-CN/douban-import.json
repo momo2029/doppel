@@ -1,0 +1,38 @@
+{
+  "id": "douban-import",
+  "name_cn": "豆瓣导入",
+  "name_en": "豆瓣 Import",
+  "description_cn": "导出豆瓣内容到记忆库",
+  "description_en": "Export 豆瓣 content to memory",
+  "type": "community",
+  "version": "1.0.0",
+  "author": "蟹蟹官方",
+  "lang": "zh-CN",
+  "rule": {
+    "capabilities": {
+      "import": true
+    },
+    "match": {
+      "urlPatterns": [
+        "*://www.douban.com/*",
+        "*://douban.com/*"
+      ]
+    },
+    "pageTypes": [],
+    "extractors": {},
+    "actions": {},
+    "onboarding": {
+      "startUrl": "https://www.douban.com/group/",
+      "loginCheck": {
+        "selector": ".nav-user-account",
+        "urlNotContains": "/accounts/login"
+      },
+      "loginUrl": "https://accounts.douban.com/passport/login",
+      "loginHint": "请先登录豆瓣账号"
+    },
+    "uiInjection": {},
+    "options": {
+      "supportedActions": []
+    }
+  }
+}

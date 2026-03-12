@@ -1,0 +1,117 @@
+{
+  "id": "douban-compose",
+  "name_cn": "豆瓣 AI 助手",
+  "name_en": "豆瓣 AI Assistant",
+  "description_cn": "在豆瓣输入框旁显示 AI 按钮，辅助创作",
+  "description_en": "AI button beside 豆瓣 input box for writing assistance",
+  "type": "community",
+  "version": "1.0.0",
+  "author": "蟹蟹官方",
+  "lang": "zh-CN",
+  "rule": {
+    "capabilities": {
+      "compose": true
+    },
+    "match": {
+      "urlPatterns": [
+        "*://www.douban.com/*",
+        "*://douban.com/*"
+      ]
+    },
+    "pageTypes": [
+      {
+        "name": "home",
+        "priority": 10,
+        "conditions": {
+          "urlMatch": "^https?://(www\\.)?douban\\.com/?$"
+        }
+      },
+      {
+        "name": "group",
+        "priority": 20,
+        "conditions": {
+          "urlContains": [
+            "/group/"
+          ],
+          "urlNotContains": [
+            "/topic/"
+          ]
+        }
+      },
+      {
+        "name": "topic",
+        "priority": 30,
+        "conditions": {
+          "urlContains": [
+            "/group/topic/"
+          ]
+        }
+      },
+      {
+        "name": "movie",
+        "priority": 25,
+        "conditions": {
+          "urlContains": [
+            "/subject/"
+          ]
+        }
+      },
+      {
+        "name": "profile",
+        "priority": 15,
+        "conditions": {
+          "urlContains": [
+            "/people/"
+          ]
+        }
+      }
+    ],
+    "extractors": {
+      "currentUser": {
+        "selector": ".nav-user-account .bn-more",
+        "transform": "trim"
+      }
+    },
+    "actions": {
+      "reply": {
+        "input": {
+          "selector": "#last textarea[name='rv_comment']",
+          "type": "textarea"
+        },
+        "submit": {
+          "selector": "#last input[type='submit']",
+          "waitAfterClick": 2000
+        }
+      }
+    },
+    "onboarding": {
+      "startUrl": "https://www.douban.com/group/",
+      "loginCheck": {
+        "selector": ".nav-user-account",
+        "urlNotContains": "/accounts/login"
+      },
+      "loginUrl": "https://accounts.douban.com/passport/login",
+      "loginHint": "请先登录豆瓣账号"
+    },
+    "uiInjection": {
+      "aiButton": {
+        "pageTypes": [
+          "topic"
+        ],
+        "injections": [
+          {
+            "targetSelector": "#last",
+            "position": "prepend",
+            "inputSelector": "#last textarea[name='rv_comment']",
+            "inputType": "textarea"
+          }
+        ]
+      }
+    },
+    "options": {
+      "supportedActions": [
+        "reply"
+      ]
+    }
+  }
+}

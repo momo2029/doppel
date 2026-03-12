@@ -1,0 +1,294 @@
+{
+  "id": "zhihu-full",
+  "name_cn": "知乎全能版",
+  "name_en": "知乎 Full Suite",
+  "description_cn": "知乎自动化 + 导入 + AI 助手三合一",
+  "description_en": "知乎 automation + import + AI assistant all-in-one",
+  "type": "community",
+  "version": "1.0.0",
+  "author": "蟹蟹官方",
+  "lang": "zh-CN",
+  "rule": {
+    "capabilities": {
+      "automate": true,
+      "import": true,
+      "compose": true
+    },
+    "match": {
+      "urlPatterns": [
+        "*://www.zhihu.com/*",
+        "*://zhihu.com/*"
+      ]
+    },
+    "pageTypes": [
+      {
+        "name": "home",
+        "priority": 10,
+        "conditions": {
+          "urlMatch": "^https?://(www\\.)?zhihu\\.com/?$"
+        }
+      },
+      {
+        "name": "question",
+        "priority": 30,
+        "conditions": {
+          "urlContains": [
+            "/question/"
+          ],
+          "urlNotContains": [
+            "/answer/"
+          ]
+        }
+      },
+      {
+        "name": "answer",
+        "priority": 40,
+        "conditions": {
+          "urlContains": [
+            "/question/",
+            "/answer/"
+          ]
+        }
+      },
+      {
+        "name": "article",
+        "priority": 35,
+        "conditions": {
+          "urlContains": [
+            "/p/"
+          ]
+        }
+      },
+      {
+        "name": "profile",
+        "priority": 20,
+        "conditions": {
+          "urlContains": [
+            "/people/"
+          ]
+        }
+      }
+    ],
+    "extractors": {
+      "lists": {
+        "home": {
+          "container": ".Topstory-mainColumn",
+          "item": ".Feed",
+          "fields": {
+            "title": {
+              "selector": ".ContentItem-title a",
+              "transform": "trim"
+            },
+            "url": {
+              "selector": ".ContentItem-title a",
+              "attribute": "href"
+            },
+            "author": {
+              "selector": ".AuthorInfo-name",
+              "transform": "trim"
+            }
+          }
+        },
+        "question": {
+          "container": ".List",
+          "item": ".List-item",
+          "fields": {
+            "title": {
+              "selector": ".ContentItem-title",
+              "transform": "trim"
+            },
+            "url": {
+              "selector": "meta[itemprop='url']",
+              "attribute": "content"
+            },
+            "author": {
+              "selector": ".AuthorInfo-name",
+              "transform": "trim"
+            }
+          }
+        }
+      },
+      "detail": {
+        "title": {
+          "selector": ".QuestionHeader-title",
+          "transform": "trim"
+        },
+        "author": {
+          "selector": ".AnswerItem .AuthorInfo-name",
+          "transform": "trim"
+        },
+        "content": {
+          "selector": ".RichContent-inner"
+        },
+        "time": {
+          "selector": ".ContentItem-time",
+          "regex": "\\d{4}-\\d{2}-\\d{2}"
+        },
+        "replies": {
+          "container": ".Comments-container",
+          "item": ".CommentItem",
+          "fields": {
+            "author": {
+              "selector": ".CommentItem-meta .UserLink-link",
+              "transform": "trim"
+            },
+            "content": {
+              "selector": ".CommentItem-content"
+            },
+            "time": {
+              "selector": ".CommentItem-time",
+              "transform": "trim"
+            }
+          }
+        }
+      },
+      "currentUser": {
+        "selector": ".AppHeader-profile .Avatar",
+        "attribute": "alt"
+      }
+    },
+    "actions": {
+      "clickPost": {
+        "selector": ".ContentItem-title a"
+      },
+      "reply": {
+        "input": {
+          "selector": ".CommentEditor textarea, .InputLike",
+          "type": "textarea"
+        },
+        "submit": {
+          "selector": ".CommentEditor button[type='button']",
+          "waitAfterClick": 2000
+        },
+        "prepare": {
+          "selector": ".Comments-container .Button--plain",
+          "waitAfterClick": 1000
+        }
+      },
+      "like": {
+        "selector": ".VoteButton--up",
+        "activeClass": "is-active",
+        "waitAfterClick": 500
+      },
+      "collect": {
+        "selector": ".ContentItem-action[aria-label*='收藏']",
+        "waitAfterClick": 500
+      },
+      "follow": {
+        "selector": ".FollowButton",
+        "activeClass": "is-following",
+        "waitAfterClick": 500
+      }
+    },
+    "contentProcessing": {
+      "cleanup": {
+        "removeSelectors": [
+          ".RichContent-actions",
+          ".ContentItem-actions"
+        ],
+        "maxLength": 3000
+      }
+    },
+    "onboarding": {
+      "startUrl": "https://www.zhihu.com",
+      "loginCheck": {
+        "selector": ".AppHeader-profile",
+        "urlNotContains": "/signin"
+      },
+      "loginUrl": "https://www.zhihu.com/signin",
+      "loginHint": "请先登录知乎账号"
+    },
+    "uiInjection": {
+      "aiButton": {
+        "pageTypes": [
+          "question",
+          "answer",
+          "article"
+        ],
+        "injections": [
+          {
+            "targetSelector": ".CommentEditor",
+            "position": "prepend",
+            "inputSelector": ".CommentEditor textarea",
+            "inputType": "textarea"
+          }
+        ]
+      },
+      "exportButton": {
+        "pageTypes": [
+          "profile"
+        ],
+        "injection": {
+          "targetSelector": ".ProfileHeader-wrapper",
+          "position": "append"
+        },
+        "buttonText": "导出回答",
+        "buttonIcon": "📤",
+        "dataSource": {
+          "listSelector": ".Profile-mainColumn",
+          "itemSelector": ".List-item",
+          "fields": {
+            "title": {
+              "selector": ".ContentItem-title",
+              "transform": "trim"
+            },
+            "content": {
+              "selector": ".RichContent-inner"
+            },
+            "time": {
+              "selector": ".ContentItem-time",
+              "regex": "\\d{4}-\\d{2}-\\d{2}"
+            },
+            "url": {
+              "selector": ".ContentItem-title a",
+              "attribute": "href"
+            }
+          },
+          "pagination": {
+            "type": "scroll",
+            "scrollDelay": 2000,
+            "maxPages": 10
+          }
+        },
+        "exportTo": {
+          "api": "/api/memory/import",
+          "platform": "zhihu"
+        }
+      }
+    },
+    "options": {
+      "supportedActions": [
+        "reply",
+        "like",
+        "collect",
+        "follow"
+      ],
+      "delays": {
+        "afterPageLoad": [
+          2000,
+          4000
+        ],
+        "afterClick": [
+          1000,
+          2000
+        ],
+        "afterReply": [
+          3000,
+          5000
+        ]
+      },
+      "patrolModes": [
+        {
+          "value": "home",
+          "label": "首页推荐",
+          "startUrl": "https://www.zhihu.com"
+        },
+        {
+          "value": "hot",
+          "label": "热榜",
+          "startUrl": "https://www.zhihu.com/hot"
+        }
+      ]
+    }
+  }
+}

@@ -1,0 +1,90 @@
+{
+  "id": "zhihu-import",
+  "name_cn": "知乎导入",
+  "name_en": "知乎 Import",
+  "description_cn": "导出知乎内容到记忆库",
+  "description_en": "Export 知乎 content to memory",
+  "type": "community",
+  "version": "1.0.0",
+  "author": "蟹蟹官方",
+  "lang": "zh-CN",
+  "rule": {
+    "capabilities": {
+      "import": true
+    },
+    "match": {
+      "urlPatterns": [
+        "*://www.zhihu.com/*",
+        "*://zhihu.com/*"
+      ]
+    },
+    "pageTypes": [
+      {
+        "name": "profile",
+        "priority": 20,
+        "conditions": {
+          "urlContains": [
+            "/people/"
+          ]
+        }
+      }
+    ],
+    "extractors": {},
+    "actions": {},
+    "onboarding": {
+      "startUrl": "https://www.zhihu.com",
+      "loginCheck": {
+        "selector": ".AppHeader-profile",
+        "urlNotContains": "/signin"
+      },
+      "loginUrl": "https://www.zhihu.com/signin",
+      "loginHint": "请先登录知乎账号"
+    },
+    "uiInjection": {
+      "exportButton": {
+        "pageTypes": [
+          "profile"
+        ],
+        "injection": {
+          "targetSelector": ".ProfileHeader-wrapper",
+          "position": "append"
+        },
+        "buttonText": "导出回答",
+        "buttonIcon": "📤",
+        "dataSource": {
+          "listSelector": ".Profile-mainColumn",
+          "itemSelector": ".List-item",
+          "fields": {
+            "title": {
+              "selector": ".ContentItem-title",
+              "transform": "trim"
+            },
+            "content": {
+              "selector": ".RichContent-inner"
+            },
+            "time": {
+              "selector": ".ContentItem-time",
+              "regex": "\\d{4}-\\d{2}-\\d{2}"
+            },
+            "url": {
+              "selector": ".ContentItem-title a",
+              "attribute": "href"
+            }
+          },
+          "pagination": {
+            "type": "scroll",
+            "scrollDelay": 2000,
+            "maxPages": 10
+          }
+        },
+        "exportTo": {
+          "api": "/api/memory/import",
+          "platform": "zhihu"
+        }
+      }
+    },
+    "options": {
+      "supportedActions": []
+    }
+  }
+}

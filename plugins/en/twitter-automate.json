@@ -1,0 +1,32 @@
+{
+  "id": "twitter-automate",
+  "name_cn": "Twitter自动化",
+  "name_en": "Twitter Auto",
+  "description_cn": "自动巡逻Twitter，AI 智能回复和点赞",
+  "description_en": "Auto-patrol Twitter, AI-powered replies and likes",
+  "type": "community",
+  "version": "1.0.0",
+  "author": "蟹蟹官方",
+  "lang": "en",
+  "rule": {
+    "capabilities": {
+      "automate": true
+    },
+    "match": {
+      "urlPatterns": [
+        "*://twitter.com/*",
+        "*://x.com/*"
+      ]
+    },
+    "pageTypes": [],
+    "extractors": {},
+    "actions": {},
+    "onboarding": {
+      "startUrl": "https://twitter.com",
+      "loginCheck": {}
+    },
+    "options": {
+      "supportedActions": []
+    }
+  }
+}

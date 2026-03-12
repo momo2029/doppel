@@ -1,0 +1,204 @@
+{
+  "id": "douban-automate",
+  "name_cn": "豆瓣自动化",
+  "name_en": "豆瓣 Auto",
+  "description_cn": "自动巡逻豆瓣，AI 智能回复和点赞",
+  "description_en": "Auto-patrol 豆瓣, AI-powered replies and likes",
+  "type": "community",
+  "version": "1.0.0",
+  "author": "蟹蟹官方",
+  "lang": "zh-CN",
+  "rule": {
+    "capabilities": {
+      "automate": true
+    },
+    "match": {
+      "urlPatterns": [
+        "*://www.douban.com/*",
+        "*://douban.com/*"
+      ]
+    },
+    "pageTypes": [
+      {
+        "name": "home",
+        "priority": 10,
+        "conditions": {
+          "urlMatch": "^https?://(www\\.)?douban\\.com/?$"
+        }
+      },
+      {
+        "name": "group",
+        "priority": 20,
+        "conditions": {
+          "urlContains": [
+            "/group/"
+          ],
+          "urlNotContains": [
+            "/topic/"
+          ]
+        }
+      },
+      {
+        "name": "topic",
+        "priority": 30,
+        "conditions": {
+          "urlContains": [
+            "/group/topic/"
+          ]
+        }
+      },
+      {
+        "name": "movie",
+        "priority": 25,
+        "conditions": {
+          "urlContains": [
+            "/subject/"
+          ]
+        }
+      },
+      {
+        "name": "profile",
+        "priority": 15,
+        "conditions": {
+          "urlContains": [
+            "/people/"
+          ]
+        }
+      }
+    ],
+    "extractors": {
+      "lists": {
+        "group": {
+          "container": ".olt",
+          "item": "tr:not(.th)",
+          "fields": {
+            "title": {
+              "selector": "td.title a",
+              "attribute": "title",
+              "transform": "trim"
+            },
+            "url": {
+              "selector": "td.title a",
+              "attribute": "href"
+            },
+            "author": {
+              "selector": "td:nth-child(2) a",
+              "transform": "trim"
+            },
+            "replyCount": {
+              "selector": "td.r-count",
+              "transform": "parseInt"
+            },
+            "time": {
+              "selector": "td.time",
+              "transform": "trim"
+            }
+          }
+        }
+      },
+      "detail": {
+        "title": {
+          "selector": "#content h1",
+          "transform": "trim"
+        },
+        "author": {
+          "selector": ".topic-doc .from a",
+          "transform": "trim"
+        },
+        "content": {
+          "selector": ".topic-content"
+        },
+        "time": {
+          "selector": ".topic-doc .color-green",
+          "regex": "\\d{4}-\\d{2}-\\d{2} \\d{2}:\\d{2}:\\d{2}"
+        },
+        "replies": {
+          "container": "#comments",
+          "item": ".comment-item",
+          "fields": {
+            "author": {
+              "selector": ".user-face a",
+              "attribute": "title"
+            },
+            "content": {
+              "selector": ".reply-content"
+            },
+            "time": {
+              "selector": ".pubtime",
+              "transform": "trim"
+            }
+          }
+        }
+      },
+      "currentUser": {
+        "selector": ".nav-user-account .bn-more",
+        "transform": "trim"
+      }
+    },
+    "actions": {
+      "clickPost": {
+        "selector": "td.title a"
+      },
+      "reply": {
+        "input": {
+          "selector": "#last textarea[name='rv_comment']",
+          "type": "textarea"
+        },
+        "submit": {
+          "selector": "#last input[type='submit']",
+          "waitAfterClick": 2000
+        }
+      },
+      "like": {
+        "selector": ".comment-vote .btn-up",
+        "activeClass": "voted",
+        "waitAfterClick": 500
+      }
+    },
+    "contentProcessing": {
+      "cleanup": {
+        "removeSelectors": [
+          ".topic-opt",
+          ".report-link"
+        ],
+        "maxLength": 3000
+      }
+    },
+    "onboarding": {
+      "startUrl": "https://www.douban.com/group/",
+      "loginCheck": {
+        "selector": ".nav-user-account",
+        "urlNotContains": "/accounts/login"
+      },
+      "loginUrl": "https://accounts.douban.com/passport/login",
+      "loginHint": "请先登录豆瓣账号"
+    },
+    "options": {
+      "supportedActions": [
+        "reply",
+        "like"
+      ],
+      "delays": {
+        "afterPageLoad": [
+          2000,
+          4000
+        ],
+        "afterClick": [
+          1000,
+          2000
+        ],
+        "afterReply": [
+          3000,
+          5000
+        ]
+      },
+      "patrolModes": [
+        {
+          "value": "group",
+          "label": "小组讨论",
+          "startUrl": "https://www.douban.com/group/"
+        }
+      ]
+    }
+  }
+}

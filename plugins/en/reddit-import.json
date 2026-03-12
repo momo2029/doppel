@@ -1,0 +1,31 @@
+{
+  "id": "reddit-import",
+  "name_cn": "Reddit导入",
+  "name_en": "Reddit Import",
+  "description_cn": "导出Reddit内容到记忆库",
+  "description_en": "Export Reddit content to memory",
+  "type": "community",
+  "version": "1.0.0",
+  "author": "蟹蟹官方",
+  "lang": "en",
+  "rule": {
+    "capabilities": {
+      "import": true
+    },
+    "match": {
+      "urlPatterns": [
+        "*://*.reddit.com/*"
+      ]
+    },
+    "pageTypes": [],
+    "extractors": {},
+    "actions": {},
+    "onboarding": {
+      "startUrl": "https://reddit.com",
+      "loginCheck": {}
+    },
+    "options": {
+      "supportedActions": []
+    }
+  }
+}

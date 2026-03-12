@@ -1,0 +1,124 @@
+{
+  "id": "zhihu-compose",
+  "name_cn": "知乎 AI 助手",
+  "name_en": "知乎 AI Assistant",
+  "description_cn": "在知乎输入框旁显示 AI 按钮，辅助创作",
+  "description_en": "AI button beside 知乎 input box for writing assistance",
+  "type": "community",
+  "version": "1.0.0",
+  "author": "蟹蟹官方",
+  "lang": "zh-CN",
+  "rule": {
+    "capabilities": {
+      "compose": true
+    },
+    "match": {
+      "urlPatterns": [
+        "*://www.zhihu.com/*",
+        "*://zhihu.com/*"
+      ]
+    },
+    "pageTypes": [
+      {
+        "name": "home",
+        "priority": 10,
+        "conditions": {
+          "urlMatch": "^https?://(www\\.)?zhihu\\.com/?$"
+        }
+      },
+      {
+        "name": "question",
+        "priority": 30,
+        "conditions": {
+          "urlContains": [
+            "/question/"
+          ],
+          "urlNotContains": [
+            "/answer/"
+          ]
+        }
+      },
+      {
+        "name": "answer",
+        "priority": 40,
+        "conditions": {
+          "urlContains": [
+            "/question/",
+            "/answer/"
+          ]
+        }
+      },
+      {
+        "name": "article",
+        "priority": 35,
+        "conditions": {
+          "urlContains": [
+            "/p/"
+          ]
+        }
+      },
+      {
+        "name": "profile",
+        "priority": 20,
+        "conditions": {
+          "urlContains": [
+            "/people/"
+          ]
+        }
+      }
+    ],
+    "extractors": {
+      "currentUser": {
+        "selector": ".AppHeader-profile .Avatar",
+        "attribute": "alt"
+      }
+    },
+    "actions": {
+      "reply": {
+        "input": {
+          "selector": ".CommentEditor textarea, .InputLike",
+          "type": "textarea"
+        },
+        "submit": {
+          "selector": ".CommentEditor button[type='button']",
+          "waitAfterClick": 2000
+        },
+        "prepare": {
+          "selector": ".Comments-container .Button--plain",
+          "waitAfterClick": 1000
+        }
+      }
+    },
+    "onboarding": {
+      "startUrl": "https://www.zhihu.com",
+      "loginCheck": {
+        "selector": ".AppHeader-profile",
+        "urlNotContains": "/signin"
+      },
+      "loginUrl": "https://www.zhihu.com/signin",
+      "loginHint": "请先登录知乎账号"
+    },
+    "uiInjection": {
+      "aiButton": {
+        "pageTypes": [
+          "question",
+          "answer",
+          "article"
+        ],
+        "injections": [
+          {
+            "targetSelector": ".CommentEditor",
+            "position": "prepend",
+            "inputSelector": ".CommentEditor textarea",
+            "inputType": "textarea"
+          }
+        ]
+      }
+    },
+    "options": {
+      "supportedActions": [
+        "reply"
+      ]
+    }
+  }
+}
