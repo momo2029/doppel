@@ -1,0 +1,387 @@
+{
+  "id": "newsmth-full",
+  "name_cn": "水木社区全能版",
+  "name_en": "Newsmth Full Suite",
+  "description_cn": "水木社区自动化 + 导入 + AI 助手三合一",
+  "description_en": "Newsmth automation + import + AI assistant all-in-one",
+  "type": "community",
+  "version": "1.1.5",
+  "author": "蟹蟹官方",
+  "lang": "zh-CN",
+  "rule": {
+    "id": "community.newsmth.full",
+    "scope": "community",
+    "name": "水木社区全能版",
+    "description": "水木社区 BBS 论坛",
+    "version": "1.1.5",
+    "author": "蟹蟹官方",
+    "homepage": "https://m.newsmth.net",
+    "createdAt": "2026-02-23T00:00:00.000Z",
+    "updatedAt": "2026-11-18T00:00:00.000Z",
+    "enabled": true,
+    "builtin": false,
+    "capabilities": {
+      "automate": true,
+      "import": true,
+      "compose": true
+    },
+    "match": {
+      "urlPatterns": [
+        "*://m.newsmth.net/*"
+      ]
+    },
+    "pageTypes": [
+      {
+        "name": "home",
+        "priority": 10,
+        "conditions": {
+          "urlMatch": "^https?://m\\.newsmth\\.net/(index(\\.php)?)?$"
+        }
+      },
+      {
+        "name": "board",
+        "priority": 20,
+        "conditions": {
+          "urlContains": [
+            "/board/"
+          ]
+        }
+      },
+      {
+        "name": "article",
+        "priority": 30,
+        "conditions": {
+          "urlContains": [
+            "/article/"
+          ],
+          "urlNotContains": [
+            "/post",
+            "/reply"
+          ]
+        }
+      },
+      {
+        "name": "reply",
+        "priority": 40,
+        "conditions": {
+          "urlContains": [
+            "/article/",
+            "/reply"
+          ]
+        }
+      },
+      {
+        "name": "refer",
+        "priority": 50,
+        "conditions": {
+          "urlContains": [
+            "/refer/"
+          ]
+        }
+      },
+      {
+        "name": "myarticle",
+        "priority": 60,
+        "conditions": {
+          "urlMatch": "wap\\.newsmth\\.net/myArticle"
+        }
+      }
+    ],
+    "extractors": {
+      "lists": {
+        "home": {
+          "container": "ul.slist.sec",
+          "item": "li:not(.f)",
+          "fields": {
+            "title": {
+              "selector": "a[href^=\"/article/\"]",
+              "transform": "trim"
+            },
+            "url": {
+              "selector": "a[href^=\"/article/\"]",
+              "attribute": "href"
+            },
+            "author": {
+              "selector": "a[href^=\"/user/query/\"]",
+              "transform": "trim"
+            }
+          }
+        },
+        "board": {
+          "container": "ul.list.sec",
+          "item": "li",
+          "fields": {
+            "title": {
+              "selector": "a[href^=\"/article/\"]",
+              "transform": "trim"
+            },
+            "url": {
+              "selector": "a[href^=\"/article/\"]",
+              "attribute": "href"
+            },
+            "author": {
+              "selector": "a[href^=\"/user/query/\"]",
+              "transform": "trim"
+            },
+            "isTop": {
+              "selector": "a.top",
+              "classCheck": {
+                "has": "top"
+              }
+            },
+            "isRead": {
+              "selector": "a[href^=\"/article/\"]",
+              "styleCheck": {
+                "property": "font-weight",
+                "operator": "lte",
+                "value": 400
+              }
+            }
+          },
+          "filters": {
+            "excludeTop": true
+          }
+        },
+        "refer": {
+          "container": "ul.list.sec",
+          "item": "li",
+          "fields": {
+            "title": {
+              "selector": "a[href^=\"/refer/\"]",
+              "transform": "trim"
+            },
+            "url": {
+              "selector": "a[href^=\"/refer/\"]",
+              "attribute": "href"
+            },
+            "author": {
+              "selector": "a[href^=\"/user/query/\"]",
+              "transform": "trim"
+            },
+            "isRead": {
+              "selector": ".",
+              "classCheck": {
+                "notHas": "no-read"
+              }
+            }
+          }
+        }
+      },
+      "detail": {
+        "title": {
+          "selector": "li.f",
+          "transform": "trim"
+        },
+        "author": {
+          "selector": "li:not(.f) a[href^=\"/user/query/\"]",
+          "transform": "trim"
+        },
+        "content": {
+          "selector": "li:not(.f) .sp"
+        },
+        "time": {
+          "selector": "li:not(.f) .stamp",
+          "regex": "\\d{4}-\\d{2}-\\d{2} \\d{2}:\\d{2}:\\d{2}"
+        },
+        "replies": {
+          "container": "ul.list.sec",
+          "item": "li:not(.f)",
+          "fields": {
+            "author": {
+              "selector": "a[href^=\"/user/query/\"]",
+              "transform": "trim"
+            },
+            "content": {
+              "selector": ".sp"
+            },
+            "time": {
+              "selector": ".stamp",
+              "regex": "\\d{4}-\\d{2}-\\d{2} \\d{2}:\\d{2}:\\d{2}"
+            },
+            "floor": {
+              "selector": ".floor",
+              "regex": "\\d+"
+            }
+          }
+        }
+      },
+      "currentUser": {
+        "selector": "a[href=\"/user/logout\"]",
+        "regex": "注销\\(([^)]+)\\)",
+        "regexGroup": 1,
+        "transform": "trim"
+      }
+    },
+    "actions": {
+      "clickPost": {
+        "selector": "a[href^=\"/article/\"]"
+      },
+      "clickRefer": {
+        "selector": "a[href^=\"/refer/reply/read\"], a[href^=\"/refer/at/read\"]"
+      },
+      "clickExpand": {
+        "selector": "a.plant"
+      },
+      "clickReplyLink": {
+        "selector": "a[href*=\"/post\"]"
+      },
+      "reply": {
+        "input": {
+          "selector": "textarea[name=\"content\"]",
+          "type": "textarea"
+        },
+        "submit": {
+          "selector": "form[action*=\"/post/\"] input[type=\"submit\"], form[action*=\"/post/\"] button[type=\"submit\"]",
+          "waitAfterClick": 2000
+        }
+      }
+    },
+    "contentProcessing": {
+      "cleanup": {
+        "removeSelectors": [
+          ".quote",
+          ".sig"
+        ],
+        "removePatterns": [
+          "\\[.*?\\]",
+          "--\\n.*$"
+        ],
+        "maxLength": 2000
+      },
+      "reply": {
+        "preserveQuote": {
+          "pattern": "【 在 .+? 的大作中提到: 】\\n(:.+\\n)*",
+          "position": "before"
+        }
+      }
+    },
+    "computedFields": {
+      "isMe": {
+        "type": "compare",
+        "fields": [
+          "author",
+          "currentUser"
+        ]
+      },
+      "hasMyReply": {
+        "type": "some",
+        "source": "replies",
+        "condition": {
+          "field": "author",
+          "equals": "$currentUser"
+        }
+      }
+    },
+    "onboarding": {
+      "startUrl": "https://m.newsmth.net",
+      "loginCheck": {
+        "anyOf": [
+          {
+            "cookieValue": {
+              "name": "main[UTMPUSERID]",
+              "notEquals": "guest"
+            }
+          },
+          {
+            "selector": "a[href=\"/user/logout\"]"
+          }
+        ],
+        "urlNotContains": "/user/login"
+      },
+      "loginUrl": "https://m.newsmth.net/user/login",
+      "loginHint": "请先登录水木社区账号"
+    },
+    "uiInjection": {
+      "aiButton": {
+        "pageTypes": [
+          "article",
+          "reply",
+          "refer"
+        ],
+        "injections": [
+          {
+            "targetSelector": "textarea[name=\"content\"]",
+            "position": "before",
+            "inputSelector": "textarea[name=\"content\"]",
+            "inputType": "textarea"
+          }
+        ]
+      },
+      "exportButton": {
+        "pageTypes": [
+          "myarticle"
+        ],
+        "injection": {
+          "targetSelector": ".ns-myarticle-count span",
+          "position": "after"
+        },
+        "buttonText": "导出文章",
+        "buttonIcon": "📤",
+        "dataSource": {
+          "type": "api",
+          "apiUrls": [
+            "/wap/api/profile/myarticle?t={timestamp}&type=0&page={page}&sort=DESC",
+            "/wap/api/profile/myarticle?t={timestamp}&type=1&page={page}&sort=DESC"
+          ],
+          "responseMapping": {
+            "list": "data.articles",
+            "hasMore": "data.articles.length > 0"
+          },
+          "fields": {
+            "id": "id",
+            "content": "body",
+            "title": "subject",
+            "time": "postTime",
+            "board": "board.name",
+            "boardTitle": "board.title"
+          },
+          "pagination": {
+            "type": "page",
+            "maxPages": 1000
+          }
+        },
+        "exportTo": {
+          "api": "/api/dna/memory/import",
+          "platform": "newsmth"
+        }
+      }
+    },
+    "options": {
+      "supportedActions": [
+        "reply"
+      ],
+      "delays": {
+        "afterPageLoad": [
+          2000,
+          4000
+        ],
+        "afterClick": [
+          1000,
+          2000
+        ],
+        "afterReply": [
+          3000,
+          5000
+        ]
+      },
+      "patrolModes": [
+        {
+          "value": "global-random",
+          "label": "全站随机浏览",
+          "startUrl": "https://m.newsmth.net"
+        },
+        {
+          "value": "current-board",
+          "label": "当前版面监控",
+          "usesCurrentPage": true,
+          "supportsReport": true
+        },
+        {
+          "value": "refer",
+          "label": "回复提醒",
+          "startUrl": "https://m.newsmth.net/refer/reply"
+        }
+      ]
+    }
+  }
+}

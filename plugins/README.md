@@ -303,27 +303,25 @@ Delays are `[min, max]` in milliseconds — the extension picks a random value i
 
 ## Plugin Naming Convention
 
-Format: `{platform}-{capability}.json`
+Format: `{platform}-full.json`
 
-| Suffix | Capabilities |
-|--------|-------------|
-| `-automate` | `automate` only |
-| `-import` | `import` only |
-| `-compose` | `compose` only |
-| `-full` | `automate` + `import` + `compose` |
+每个站点只维护一个全能版插件（`automate` + `import` + `compose`）。
+历史上的 `-automate` / `-import` / `-compose` 分体版本已合并进 `-full`，不再单独发布——
+同一站点存在多份规则会同时匹配同一域名，导致插件列表重复、规则互相抢占。
 
 ## Directory Structure
 
 ```
 plugins/
 ├── zh-CN/          # Chinese platform plugins
-│   ├── weibo-automate.json
-│   ├── weibo-import.json
-│   ├── weibo-compose.json
-│   └── weibo-full.json
+│   ├── newsmth-full.json
+│   ├── weibo-full.json
+│   ├── zhihu-full.json
+│   ├── xiaohongshu-full.json
+│   └── douban-full.json
 ├── en/             # English platform plugins
-│   ├── reddit-automate.json
-│   └── reddit-full.json
+│   ├── reddit-full.json
+│   └── twitter-full.json
 ├── schema.json     # JSON Schema for validation
 └── README.md       # This file
 ```
